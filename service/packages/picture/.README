@@ -1,0 +1,3 @@
+Need image magick installed with webp?
+
+There's an ansible role called 'webp-imagemagick', which can be found on rawnet-one-marketing repo

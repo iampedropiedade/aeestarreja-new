@@ -1,0 +1,94 @@
+.multiple-files-wrapper .multiple-files-selected-list {
+    border: 1px solid #dedede;
+    border-radius: 2px;
+    padding: 5px 10px 0 10px;
+    background: #fff;
+    min-height: 40px;
+}
+
+.multiple-files-wrapper .multiple-files-selected-list .selected-file {
+    border: 1px solid #ccc;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: inline-block;
+    position: relative;
+    width: 9rem;
+    height: 9rem;
+}
+
+.multiple-files-wrapper .multiple-files-selected-list .selected-file img {
+    width: 100%;
+    height: 100%;
+}
+
+
+.multiple-files-wrapper .multiple-files-selected-list .selected-file:hover {
+    cursor: move;
+    cursor: -webkit-grab;
+}
+
+.multiple-files-wrapper .multiple-files-selected-list .selected-file:focus,
+.multiple-files-wrapper .multiple-files-selected-list .selected-file:active {
+    cursor: -webkit-grabbing;
+}
+
+.ui-state-default,
+.multiple-files-wrapper .multiple-files-selected-list .selected-file .icon {
+    background: transparent none;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+}
+
+.multiple-files-wrapper .multiple-files-selected-list .selected-file .title {
+    display: block;
+    font-size: 0.7rem;
+    overflow: hidden;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 3;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 5px;
+    text-align: center;
+    color: #fff;
+    font-weight: bold;
+}
+
+.multiple-files-wrapper .multiple-files-selected-list .selected-file .delete {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    padding: 3px 5px;
+    font-size: 14px;
+    line-height: 14px;
+    border-radius: 50%;
+    display: block;
+    width: 24px;
+    height: 24px;
+    background-color: indianred;
+    border: 1px solid #aa5050;
+    color: white;
+}
+
+.multiple-files-wrapper .multiple-files-selected-list .selected-file .delete:hover {
+    background-color: #b85b5b;
+    border-color: #a35252;
+}
+
+.ccm-ui .help-block {
+    font-size: 12px;
+    margin: 5px 0;
+    color: #737373;
+}
+
+.button-wrapper {
+    margin-top: 10px;
+}
+
+.button-wrapper .btn {
+    font-size: 13px;
+    width: 100%;
+}

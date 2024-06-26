@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema
+xmlns="http://www.concrete5.org/doctrine-xml/0.5"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.concrete5.org/doctrine-xml/0.5 http://concrete5.github.io/doctrine-xml/doctrine-xml-0.5.xsd">
+    <table name="btNewsList">
+        <field name="bID" type="integer">
+            <unsigned/>
+            <autoincrement/>
+        </field>
+        <field name="title" type="string" size="1024" />
+        <field name="subtitle" type="string" size="1024" />
+        <field name="intro" type="text" />
+        <field name="maxItems" type="integer" />
+        <field name="handle" type="string" size="1024" />
+        <field name="style" type="string" size="1024" />
+        <field name="tags" type="string" />
+        <field name="tagsFilterOut" type="string" />
+        <field name="buttonCaption" type="string" size="1024" />
+    </table>
+</schema>

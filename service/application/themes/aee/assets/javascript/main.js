@@ -1,0 +1,14 @@
+import "./libraries/popper.min.js";
+import "./libraries/bootstrap.min.js";
+import "./libraries/jquery.easing.1.3.js";
+import "./libraries/jquery.waypoints.min.js";
+import "./libraries/jquery.stellar.min.js";
+import "./libraries/owl.carousel.min.js";
+import "./libraries/jquery.magnific-popup.min.js";
+import "./libraries/jquery.animateNumber.min.js";
+import "./libraries/scrollax.min.js";
+import "./libraries/parsley.min.js";
+import "./libraries/parsley-pt-pt.js";
+import "./libraries/search.js";
+import "./libraries/select2.min.js";
+import "./application.js";

@@ -1,0 +1,38 @@
+build:
+	docker-compose build
+
+start:
+	docker-compose up -d
+
+stop:
+	docker stop aeestarreja_app
+	docker stop aeestarreja_db
+
+fix:
+	docker run --entrypoint "" --rm -it -v $(CURDIR)/public:/var/www/html -v $(CURDIR)/phpcs.xml:/var/www/html/phpcs.xml php:7.4-apache bash -c "cd /var/www/html && php vendor/bin/phpcbf"
+
+stan:
+	docker run --entrypoint "" --rm -it -v $(CURDIR)/phpstan.neon:/var/www/html/phpstan.neon -v $(CURDIR)/app:/var/www/html php:7.4-apache bash -c "cd /var/www/html && php vendor/bin/phpstan analyse"
+
+phpcs:
+	docker run --entrypoint "" --rm -it -v $(CURDIR)/phpcs.xml:/var/www/html/phpcs.xml -v $(CURDIR)/app:/var/www/html php:7.4-apache bash -c "cd /var/www/html && php vendor/bin/phpcs"
+
+ssh:
+	docker exec -it aeestarreja_app bash
+
+ssh-db:
+	docker exec -it aeestarreja_db bash
+
+ui:
+	docker exec -it aeestarreja_app sh -c "cd /var/www/html/application/themes/aee/assets && yarn production"
+
+composer:
+	docker exec -it aeestarreja_app sh -c "cd /var/www/html && composer install"
+
+git-pull:
+	eval $(ssh-agent -s) && ssh-add ~/.ssh/aeestarreja_rsa && git pull
+
+deploy:
+	$(MAKE) git-pull
+	$(MAKE) composer
+	$(MAKE) ui
