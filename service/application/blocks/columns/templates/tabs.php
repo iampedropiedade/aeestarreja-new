@@ -21,42 +21,44 @@ $style = isset($style) ? $style : '';
                 </div>
             </div>
         <?php endif;?>
-        <nav>
-            <div class="nav nav-tabs" role="tablist">
+        <div class="tabbed-content">
+            <nav>
+                <div class="nav nav-tabs" role="tablist">
+                    <?php foreach($items as $key => $item) : ?>
+                        <?php
+                        if($item['type'] !== 'title_content') {
+                            continue;
+                        }
+                        ?>
+                        <a class="nav-item nav-link <?php echo $key === 0 ? 'active' : ''; ?>"
+                           id="<?php echo sprintf('tab-%s-%s-tab', $bID, $key); ?>"
+                           data-toggle="tab"
+                           href="<?php echo sprintf('#tab-%s-%s', $bID, $key); ?>"
+                           role="tab"
+                           aria-controls="<?php echo sprintf('tab-%s-%s', $bID, $key); ?>"
+                           aria-selected="<?php echo $key === 0 ? 'true' : 'false'; ?>"
+                        >
+                            <?php echo $item['title']; ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </nav>
+            <div class="tab-content" id="tabs-block-<?php echo $bID; ?>">
                 <?php foreach($items as $key => $item) : ?>
                     <?php
                     if($item['type'] !== 'title_content') {
                         continue;
                     }
                     ?>
-                    <a class="nav-item nav-link <?php echo $key === 0 ? 'active' : ''; ?>"
-                       id="<?php echo sprintf('tab-%s-%s-tab', $bID, $key); ?>"
-                       data-toggle="tab"
-                       href="<?php echo sprintf('#tab-%s-%s', $bID, $key); ?>"
-                       role="tab"
-                       aria-controls="<?php echo sprintf('tab-%s-%s', $bID, $key); ?>"
-                       aria-selected="<?php echo $key === 0 ? 'true' : 'false'; ?>"
+                    <div class="tab-pane fade <?php echo $key === 0 ? 'show active' : ''; ?> cards-style-list"
+                         id="<?php echo sprintf('tab-%s-%s', $bID, $key); ?>"
+                         role="tabpanel"
+                         aria-labelledby="<?php echo sprintf('tab-%s-%s', $bID, $key); ?>"
                     >
-                        <h5><?php echo $item['title']; ?></h5>
-                    </a>
+                        <?php echo $item['content']; ?>
+                    </div>
                 <?php endforeach; ?>
             </div>
-        </nav>
-        <div class="tab-content mt-4" id="tabs-block-<?php echo $bID; ?>">
-            <?php foreach($items as $key => $item) : ?>
-                <?php
-                if($item['type'] !== 'title_content') {
-                    continue;
-                }
-                ?>
-                <div class="tab-pane fade <?php echo $key === 0 ? 'show active' : ''; ?> cards-style-list"
-                     id="<?php echo sprintf('tab-%s-%s', $bID, $key); ?>"
-                     role="tabpanel"
-                     aria-labelledby="<?php echo sprintf('tab-%s-%s', $bID, $key); ?>"
-                >
-                    <?php echo $item['content']; ?>
-                </div>
-            <?php endforeach; ?>
         </div>
     </div>
 </section>
