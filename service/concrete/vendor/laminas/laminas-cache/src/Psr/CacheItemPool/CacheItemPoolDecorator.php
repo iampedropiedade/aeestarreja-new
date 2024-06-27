@@ -2,6 +2,7 @@
 
 namespace Laminas\Cache\Psr\CacheItemPool;
 
+use DateTimeImmutable;
 use Laminas\Cache\Exception;
 use Laminas\Cache\Psr\MaximumKeyLengthTrait;
 use Laminas\Cache\Psr\SerializationTrait;
@@ -10,6 +11,7 @@ use Laminas\Cache\Storage\FlushableInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Clock\ClockInterface;
 
 use function array_diff;
 use function array_diff_key;
@@ -20,7 +22,6 @@ use function array_unique;
 use function array_values;
 use function assert;
 use function current;
-use function get_class;
 use function gettype;
 use function in_array;
 use function is_array;
@@ -41,11 +42,12 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
     use MaximumKeyLengthTrait;
     use SerializationTrait;
 
-    /** @var StorageInterface */
-    private $storage;
+    private StorageInterface $storage;
 
     /** @var array<string,CacheItem> */
-    private $deferred = [];
+    private array $deferred = [];
+
+    private ClockInterface $clock;
 
     /**
      * PSR-6 requires that all implementing libraries support TTL so the given storage adapter must also support static
@@ -54,12 +56,20 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
      *
      * @throws CacheException
      */
-    public function __construct(StorageInterface $storage)
+    public function __construct(StorageInterface $storage, ?ClockInterface $clock = null)
     {
         $this->validateStorage($storage);
         $capabilities = $storage->getCapabilities();
         $this->memoizeMaximumKeyLengthCapability($storage, $capabilities);
         $this->storage = $storage;
+        $clock       ??= new class implements ClockInterface
+        {
+            public function now(): DateTimeImmutable
+            {
+                return new DateTimeImmutable();
+            }
+        };
+        $this->clock   = $clock;
     }
 
     /**
@@ -84,11 +94,11 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
                 $value = $this->storage->getItem($key, $isHit);
             } catch (Exception\InvalidArgumentException $e) {
                 throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-            } catch (Exception\ExceptionInterface $e) {
+            } catch (Exception\ExceptionInterface) {
                 // ignore
             }
 
-            return new CacheItem($key, $value, $isHit ?? false);
+            return new CacheItem($key, $value, $isHit ?? false, $this->clock);
         }
 
         return clone $this->deferred[$key];
@@ -117,18 +127,18 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
                 $cacheItems = $this->storage->getItems($keys);
             } catch (Exception\InvalidArgumentException $e) {
                 throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-            } catch (Exception\ExceptionInterface $e) {
+            } catch (Exception\ExceptionInterface) {
                 $cacheItems = [];
             }
 
             foreach ($cacheItems as $key => $value) {
                 assert(is_string($key));
-                $items[$key] = new CacheItem($key, $value, true);
+                $items[$key] = new CacheItem($key, $value, true, $this->clock);
             }
 
             // Return empty items for any keys that where not found
             foreach (array_diff($keys, array_keys($cacheItems)) as $key) {
-                $items[$key] = new CacheItem($key, null, false);
+                $items[$key] = new CacheItem($key, null, false, $this->clock);
             }
         }
 
@@ -151,7 +161,7 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
             return $this->storage->hasItem($key);
         } catch (Exception\InvalidArgumentException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-        } catch (Exception\ExceptionInterface $e) {
+        } catch (Exception\ExceptionInterface) {
             return false;
         }
     }
@@ -174,7 +184,7 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
             } else {
                 $cleared = $this->storage->flush();
             }
-        } catch (Exception\ExceptionInterface $e) {
+        } catch (Exception\ExceptionInterface) {
             $cleared = false;
         }
 
@@ -204,7 +214,7 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
             $result = $this->storage->removeItems($keys);
         } catch (Exception\InvalidArgumentException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-        } catch (Exception\ExceptionInterface $e) {
+        } catch (Exception\ExceptionInterface) {
             return false;
         }
 
@@ -297,7 +307,7 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
                 'The storage adapter "%s" requires a serializer plugin; please see'
                 . ' https://docs.laminas.dev/laminas-cache/storage/plugin/#quick-start'
                 . ' for details on how to attach the plugin to your adapter.',
-                get_class($storage)
+                $storage::class
             ));
         }
 
@@ -305,7 +315,7 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
         if (! $storage instanceof FlushableInterface) {
             throw new CacheException(sprintf(
                 'Storage %s does not implement %s',
-                get_class($storage),
+                $storage::class,
                 FlushableInterface::class
             ));
         }
@@ -315,21 +325,21 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
         if (! ($capabilities->getStaticTtl() && $capabilities->getMinTtl())) {
             throw new CacheException(sprintf(
                 'Storage %s does not support static TTL',
-                get_class($storage)
+                $storage::class
             ));
         }
 
         if ($capabilities->getUseRequestTime()) {
             throw new CacheException(sprintf(
                 'The capability "use-request-time" of storage %s violates PSR-6',
-                get_class($storage)
+                $storage::class
             ));
         }
 
         if ($capabilities->getLockOnExpire()) {
             throw new CacheException(sprintf(
                 'The capability "lock-on-expire" of storage %s violates PSR-6',
-                get_class($storage)
+                $storage::class
             ));
         }
     }
@@ -352,10 +362,9 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
     /**
      * Throws exception if given key is invalid
      *
-     * @param mixed $key
      * @throws InvalidArgumentException
      */
-    private function validateKey($key)
+    private function validateKey(mixed $key)
     {
         if (! is_string($key) || preg_match('#[{}()/\\\\@:]#', $key)) {
             throw new InvalidArgumentException(sprintf(
@@ -419,7 +428,7 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
             $notSavedKeys = $this->storage->setItems($keyValuePair);
         } catch (Exception\InvalidArgumentException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-        } catch (Exception\ExceptionInterface $e) {
+        } catch (Exception\ExceptionInterface) {
             $notSavedKeys = array_keys($keyValuePair);
         } finally {
             $options->setTtl($ttl);

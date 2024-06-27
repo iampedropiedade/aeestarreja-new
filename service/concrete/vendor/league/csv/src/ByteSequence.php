@@ -13,31 +13,15 @@ namespace League\Csv;
 
 /**
  * Defines constants for common BOM sequences.
+ *
+ * @deprecated since version 9.16.0
+ * @see Bom
  */
 interface ByteSequence
 {
-    /**
-     *  UTF-8 BOM sequence.
-     */
-    const BOM_UTF8 = "\xEF\xBB\xBF";
-
-    /**
-     * UTF-16 BE BOM sequence.
-     */
-    const BOM_UTF16_BE = "\xFE\xFF";
-
-    /**
-     * UTF-16 LE BOM sequence.
-     */
-    const BOM_UTF16_LE = "\xFF\xFE";
-
-    /**
-     * UTF-32 BE BOM sequence.
-     */
-    const BOM_UTF32_BE = "\x00\x00\xFE\xFF";
-
-    /**
-     * UTF-32 LE BOM sequence.
-     */
-    const BOM_UTF32_LE = "\xFF\xFE\x00\x00";
+    public const BOM_UTF8 = "\xEF\xBB\xBF";
+    public const BOM_UTF16_BE = "\xFE\xFF";
+    public const BOM_UTF16_LE = "\xFF\xFE";
+    public const BOM_UTF32_BE = "\x00\x00\xFE\xFF";
+    public const BOM_UTF32_LE = "\xFF\xFE\x00\x00";
 }

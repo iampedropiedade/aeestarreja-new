@@ -18,8 +18,8 @@ use function mkdir;
 use function ob_implicit_flush;
 use function ob_start;
 use function rtrim;
+use function str_ends_with;
 use function str_replace;
-use function substr;
 use function umask;
 use function unlink;
 
@@ -40,7 +40,7 @@ class CaptureCache extends AbstractPattern
             $pageId = $this->detectPageId();
         }
 
-        ob_start(function ($content) use ($pageId) {
+        ob_start(function ($content) use ($pageId): bool {
             $this->set($content, $pageId);
 
             // http://php.net/manual/function.ob-start.php
@@ -48,7 +48,7 @@ class CaptureCache extends AbstractPattern
             return false;
         });
 
-        ob_implicit_flush(0);
+        ob_implicit_flush(false);
     }
 
     /**
@@ -218,7 +218,7 @@ class CaptureCache extends AbstractPattern
      */
     protected function pageId2Filename($pageId)
     {
-        if (substr($pageId, -1) === '/') {
+        if (str_ends_with($pageId, '/')) {
             return $this->getOptions()->getIndexFilename();
         }
 
@@ -233,7 +233,7 @@ class CaptureCache extends AbstractPattern
      */
     protected function pageId2Path($pageId)
     {
-        if (substr($pageId, -1) === '/') {
+        if (str_ends_with($pageId, '/')) {
             $path = rtrim($pageId, '/');
         } else {
             $path = dirname($pageId);
@@ -314,14 +314,14 @@ class CaptureCache extends AbstractPattern
             // built-in mkdir function is enough
 
             $umask = $umask !== false ? umask($umask) : false;
-            $res   = mkdir($pathname, $perm !== false ? $perm : 0775, true);
+            $res   = mkdir($pathname, 0775, true);
 
             if ($umask !== false) {
                 umask($umask);
             }
 
             if (! $res) {
-                $oct = $perm === false ? '775' : decoct($perm);
+                $oct = '775';
                 $err = ErrorHandler::stop();
                 throw new Exception\RuntimeException("mkdir('{$pathname}', 0{$oct}, true) failed", 0, $err);
             }
@@ -354,20 +354,20 @@ class CaptureCache extends AbstractPattern
 
                 // create a single directory, set and reset umask immediately
                 $umask = $umask !== false ? umask($umask) : false;
-                $res   = mkdir($path, $perm === false ? 0775 : $perm, false);
+                $res   = mkdir($path, $perm, false);
                 if ($umask !== false) {
                     umask($umask);
                 }
 
                 if (! $res) {
-                    $oct = $perm === false ? '775' : decoct($perm);
+                    $oct = decoct($perm);
                     ErrorHandler::stop();
                     throw new Exception\RuntimeException(
                         "mkdir('{$path}', 0{$oct}, false) failed"
                     );
                 }
 
-                if ($perm !== false && ! chmod($path, $perm)) {
+                if (! chmod($path, $perm)) {
                     $oct = decoct($perm);
                     ErrorHandler::stop();
                     throw new Exception\RuntimeException(

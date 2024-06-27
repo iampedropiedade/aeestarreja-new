@@ -23,6 +23,9 @@ ssh:
 ssh-db:
 	docker exec -it aeestarreja_db bash
 
+open:
+	open http://localhost:8090/
+
 ui:
 	docker exec -it aeestarreja_app sh -c "cd /var/www/html/application/themes/aee/assets && yarn production"
 
@@ -36,3 +39,6 @@ deploy:
 	$(MAKE) git-pull
 	$(MAKE) composer
 	$(MAKE) ui
+
+sync-files:
+    cd /Users/pedropiedade/Documents/http/pedro/aeestarreja/aeestarreja/service/application && rsync -arv --stats --exclude='cache' root@68.183.78.54:/var/www/html/public/application/files .

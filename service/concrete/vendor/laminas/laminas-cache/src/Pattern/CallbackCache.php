@@ -48,7 +48,7 @@ class CallbackCache extends AbstractStorageCapablePattern
         $cacheOutput = $options->getCacheOutput();
         if ($cacheOutput) {
             ob_start();
-            ob_implicit_flush(0);
+            ob_implicit_flush(false);
         }
 
         // TODO: do not cache on errors using [set|restore]_error_handler
@@ -155,7 +155,6 @@ class CallbackCache extends AbstractStorageCapablePattern
     /**
      * Generate a unique key of the argument part.
      *
-     * @param  array $args
      * @throws Exception\RuntimeException
      * @return string
      */

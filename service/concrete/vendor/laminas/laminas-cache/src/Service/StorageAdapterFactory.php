@@ -12,7 +12,6 @@ use Laminas\ServiceManager\PluginManagerInterface;
 use Webmozart\Assert\Assert;
 
 use function assert;
-use function get_class;
 use function is_string;
 use function sprintf;
 
@@ -23,16 +22,10 @@ final class StorageAdapterFactory implements StorageAdapterFactoryInterface
 {
     public const DEFAULT_PLUGIN_PRIORITY = 1;
 
-    /** @var PluginManagerInterface */
-    private $adapters;
-
-    /** @var StoragePluginFactoryInterface */
-    private $pluginFactory;
-
-    public function __construct(PluginManagerInterface $adapters, StoragePluginFactoryInterface $pluginFactory)
-    {
-        $this->adapters      = $adapters;
-        $this->pluginFactory = $pluginFactory;
+    public function __construct(
+        private PluginManagerInterface $adapters,
+        private StoragePluginFactoryInterface $pluginFactory
+    ) {
     }
 
     public function createFromArrayConfiguration(array $configuration): StorageInterface
@@ -57,7 +50,7 @@ final class StorageAdapterFactory implements StorageAdapterFactoryInterface
         if (! $adapter instanceof PluginAwareInterface) {
             throw new Exception\RuntimeException(sprintf(
                 "The adapter '%s' doesn't implement '%s' and therefore can't handle plugins",
-                get_class($adapter),
+                $adapter::class,
                 PluginAwareInterface::class
             ));
         }
@@ -74,6 +67,7 @@ final class StorageAdapterFactory implements StorageAdapterFactoryInterface
         return $adapter;
     }
 
+    /** @psalm-assert PluginArrayConfigurationWithPriorityType $configuration */
     public function assertValidConfigurationStructure(array $configuration): void
     {
         try {

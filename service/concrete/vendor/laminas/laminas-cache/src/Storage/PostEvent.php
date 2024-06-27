@@ -30,10 +30,9 @@ class PostEvent extends Event
     /**
      * Set the result/return value
      *
-     * @param  mixed $value
      * @return PostEvent
      */
-    public function setResult(&$value)
+    public function setResult(mixed &$value)
     {
         $this->result = &$value;
         return $this;
@@ -44,7 +43,7 @@ class PostEvent extends Event
      *
      * @return mixed
      */
-    public function & getResult()
+    public function &getResult()
     {
         return $this->result;
     }

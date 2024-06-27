@@ -18,11 +18,10 @@ use Throwable;
 use Traversable;
 
 use function array_keys;
-use function get_class;
+use function get_debug_type;
 use function gettype;
 use function is_array;
 use function is_int;
-use function is_object;
 use function is_string;
 use function preg_match;
 use function preg_quote;
@@ -42,11 +41,9 @@ class SimpleCacheDecorator implements SimpleCacheInterface
      */
     public const INVALID_KEY_CHARS = ':@{}()/\\';
 
-    /** @var bool */
-    private $providesPerItemTtl = true;
+    private bool $providesPerItemTtl = true;
 
-    /** @var StorageInterface */
-    private $storage;
+    private StorageInterface $storage;
 
     /**
      * Reference used by storage when calling getItem() to indicate status of
@@ -56,8 +53,7 @@ class SimpleCacheDecorator implements SimpleCacheInterface
      */
     private $success;
 
-    /** @var DateTimeZone */
-    private $utc;
+    private DateTimeZone $utc;
 
     public function __construct(StorageInterface $storage)
     {
@@ -66,7 +62,7 @@ class SimpleCacheDecorator implements SimpleCacheInterface
                 'The storage adapter "%s" requires a serializer plugin; please see'
                 . ' https://docs.laminas.dev/laminas-cache/storage/plugin/#quick-start'
                 . ' for details on how to attach the plugin to your adapter.',
-                get_class($storage)
+                $storage::class
             ));
         }
 
@@ -92,7 +88,7 @@ class SimpleCacheDecorator implements SimpleCacheInterface
             throw static::translateThrowable($e);
         }
 
-        $result = $result ?? $default;
+        $result ??= $default;
         return $this->success ? $result : $default;
     }
 
@@ -143,7 +139,7 @@ class SimpleCacheDecorator implements SimpleCacheInterface
 
         try {
             return null !== $this->storage->removeItem($key);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return false;
         }
     }
@@ -171,9 +167,6 @@ class SimpleCacheDecorator implements SimpleCacheInterface
      */
     public function getMultiple($keys, $default = null)
     {
-        /**
-         * @psalm-suppress DocblockTypeContradiction Since we do not have native type-hints, we should verify iterable.
-         */
         if (! is_array($keys) && ! $keys instanceof Traversable) {
             throw new SimpleCacheInvalidArgumentException(sprintf(
                 'Invalid value provided to %s; must be iterable',
@@ -204,9 +197,6 @@ class SimpleCacheDecorator implements SimpleCacheInterface
      */
     public function setMultiple($values, $ttl = null)
     {
-        /**
-         * @psalm-suppress DocblockTypeContradiction Since we do not have native type-hints, we should verify iterable.
-         */
         if (! is_array($values) && ! $values instanceof Traversable) {
             throw new SimpleCacheInvalidArgumentException(sprintf(
                 'Invalid value provided to %s; must be iterable',
@@ -263,9 +253,6 @@ class SimpleCacheDecorator implements SimpleCacheInterface
      */
     public function deleteMultiple($keys)
     {
-        /**
-         * @psalm-suppress DocblockTypeContradiction Since we do not have native type-hints, we should verify iterable.
-         */
         if (! is_array($keys) && ! $keys instanceof Traversable) {
             throw new SimpleCacheInvalidArgumentException(sprintf(
                 'Invalid value provided to %s; must be iterable',
@@ -280,7 +267,7 @@ class SimpleCacheDecorator implements SimpleCacheInterface
 
         try {
             $result = $this->storage->removeItems($keys);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return false;
         }
 
@@ -412,13 +399,12 @@ class SimpleCacheDecorator implements SimpleCacheInterface
         // All others are invalid
         throw new SimpleCacheInvalidArgumentException(sprintf(
             'Invalid TTL "%s" provided; must be null, an integer, or a %s instance',
-            is_object($ttl) ? get_class($ttl) : var_export($ttl, true),
+            get_debug_type($ttl),
             DateInterval::class
         ));
     }
 
     /**
-     * @param iterable $keys
      * @psalm-return list<string|int>
      * @throws SimpleCacheInvalidArgumentException For invalid $iterable values.
      */
@@ -429,7 +415,7 @@ class SimpleCacheDecorator implements SimpleCacheInterface
             if (! is_string($key) && ! is_int($key)) {
                 throw new SimpleCacheInvalidArgumentException(sprintf(
                     'Invalid key detected of type "%s"; must be a scalar',
-                    is_object($key) ? get_class($key) : gettype($key)
+                    get_debug_type($key)
                 ));
             }
 
@@ -441,7 +427,6 @@ class SimpleCacheDecorator implements SimpleCacheInterface
     }
 
     /**
-     * @param iterable $values
      * @psalm-return array<int|string,mixed>
      */
     private function convertIterableToKeyValueMap(iterable $values): array
@@ -451,7 +436,7 @@ class SimpleCacheDecorator implements SimpleCacheInterface
             if (! is_string($key) && ! is_int($key)) {
                 throw new SimpleCacheInvalidArgumentException(sprintf(
                     'Invalid key detected of type "%s"; must be a scalar',
-                    is_object($key) ? get_class($key) : gettype($key)
+                    get_debug_type($key)
                 ));
             }
 

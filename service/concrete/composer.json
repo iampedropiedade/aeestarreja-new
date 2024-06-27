@@ -18,7 +18,8 @@
       "*": "dist"
     },
     "allow-plugins": {
-      "mlocati/composer-patcher": true
+      "mlocati/composer-patcher": true,
+      "wikimedia/composer-merge-plugin": true
     }
   },
   "autoload": {

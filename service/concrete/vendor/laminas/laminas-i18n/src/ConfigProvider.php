@@ -2,14 +2,27 @@
 
 namespace Laminas\I18n;
 
+use Laminas\ServiceManager\ConfigInterface;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
+/**
+ * @see ConfigInterface
+ *
+ * @psalm-import-type ServiceManagerConfigurationType from ConfigInterface
+ * @final
+ */
 class ConfigProvider
 {
     /**
      * Return general-purpose laminas-i18n configuration.
      *
-     * @return array
+     * @return array{
+     *     dependencies: ServiceManagerConfigurationType,
+     *     filters: ServiceManagerConfigurationType,
+     *     validators: ServiceManagerConfigurationType,
+     *     view_helpers: ServiceManagerConfigurationType,
+     *     locale: string|null,
+     * }
      */
     public function __invoke()
     {
@@ -18,27 +31,30 @@ class ConfigProvider
             'filters'      => $this->getFilterConfig(),
             'validators'   => $this->getValidatorConfig(),
             'view_helpers' => $this->getViewHelperConfig(),
+            'locale'       => null,
         ];
     }
 
     /**
      * Return application-level dependency configuration.
      *
-     * @return array
+     * @return ServiceManagerConfigurationType
      */
     public function getDependencyConfig()
     {
         return [
-            'aliases' => [
+            'aliases'   => [
                 'TranslatorPluginManager' => Translator\LoaderPluginManager::class,
 
                 // Legacy Zend Framework aliases
-                \Zend\I18n\Translator\TranslatorInterface::class => Translator\TranslatorInterface::class,
-                \Zend\I18n\Translator\LoaderPluginManager::class => Translator\LoaderPluginManager::class,
+                'Zend\I18n\Translator\TranslatorInterface' => Translator\TranslatorInterface::class,
+                'Zend\I18n\Translator\LoaderPluginManager' => Translator\LoaderPluginManager::class,
+                Geography\CountryCodeListInterface::class  => Geography\DefaultCountryCodeList::class,
             ],
             'factories' => [
-                Translator\TranslatorInterface::class => Translator\TranslatorServiceFactory::class,
-                Translator\LoaderPluginManager::class => Translator\LoaderPluginManagerFactory::class,
+                Translator\TranslatorInterface::class   => Translator\TranslatorServiceFactory::class,
+                Translator\LoaderPluginManager::class   => Translator\LoaderPluginManagerFactory::class,
+                Geography\DefaultCountryCodeList::class => [Geography\DefaultCountryCodeList::class, 'create'],
             ],
         ];
     }
@@ -46,12 +62,12 @@ class ConfigProvider
     /**
      * Return laminas-filter configuration.
      *
-     * @return array
+     * @return ServiceManagerConfigurationType
      */
     public function getFilterConfig()
     {
         return [
-            'aliases' => [
+            'aliases'   => [
                 'alnum'        => Filter\Alnum::class,
                 'Alnum'        => Filter\Alnum::class,
                 'alpha'        => Filter\Alpha::class,
@@ -64,10 +80,10 @@ class ConfigProvider
                 'NumberParse'  => Filter\NumberParse::class,
 
                 // Legacy Zend Framework aliases
-                \Zend\I18n\Filter\Alnum::class => Filter\Alnum::class,
-                \Zend\I18n\Filter\Alpha::class => Filter\Alpha::class,
-                \Zend\I18n\Filter\NumberFormat::class => Filter\NumberFormat::class,
-                \Zend\I18n\Filter\NumberParse::class => Filter\NumberParse::class,
+                'Zend\I18n\Filter\Alnum'        => Filter\Alnum::class,
+                'Zend\I18n\Filter\Alpha'        => Filter\Alpha::class,
+                'Zend\I18n\Filter\NumberFormat' => Filter\NumberFormat::class,
+                'Zend\I18n\Filter\NumberParse'  => Filter\NumberParse::class,
             ],
             'factories' => [
                 Filter\Alnum::class        => InvokableFactory::class,
@@ -81,12 +97,12 @@ class ConfigProvider
     /**
      * Return laminas-validator configuration.
      *
-     * @return array
+     * @return ServiceManagerConfigurationType
      */
     public function getValidatorConfig()
     {
         return [
-            'aliases' => [
+            'aliases'   => [
                 'alnum'       => Validator\Alnum::class,
                 'Alnum'       => Validator\Alnum::class,
                 'alpha'       => Validator\Alpha::class,
@@ -112,13 +128,13 @@ class ConfigProvider
                 'PostCode'    => Validator\PostCode::class,
 
                 // Legacy Zend Framework aliases
-                \Zend\I18n\Validator\Alnum::class => Validator\Alnum::class,
-                \Zend\I18n\Validator\Alpha::class => Validator\Alpha::class,
-                \Zend\I18n\Validator\DateTime::class => Validator\DateTime::class,
-                \Zend\I18n\Validator\IsFloat::class => Validator\IsFloat::class,
-                \Zend\I18n\Validator\IsInt::class => Validator\IsInt::class,
-                \Zend\I18n\Validator\PhoneNumber::class => Validator\PhoneNumber::class,
-                \Zend\I18n\Validator\PostCode::class => Validator\PostCode::class,
+                'Zend\I18n\Validator\Alnum'       => Validator\Alnum::class,
+                'Zend\I18n\Validator\Alpha'       => Validator\Alpha::class,
+                'Zend\I18n\Validator\DateTime'    => Validator\DateTime::class,
+                'Zend\I18n\Validator\IsFloat'     => Validator\IsFloat::class,
+                'Zend\I18n\Validator\IsInt'       => Validator\IsInt::class,
+                'Zend\I18n\Validator\PhoneNumber' => Validator\PhoneNumber::class,
+                'Zend\I18n\Validator\PostCode'    => Validator\PostCode::class,
             ],
             'factories' => [
                 Validator\Alnum::class       => InvokableFactory::class,
@@ -137,44 +153,46 @@ class ConfigProvider
      *
      * Obsoletes View\HelperConfig.
      *
-     * @return array
+     * @return ServiceManagerConfigurationType
      */
     public function getViewHelperConfig()
     {
         return [
-            'aliases' => [
-                'currencyformat'  => View\Helper\CurrencyFormat::class,
-                'currencyFormat'  => View\Helper\CurrencyFormat::class,
-                'CurrencyFormat'  => View\Helper\CurrencyFormat::class,
-                'dateformat'      => View\Helper\DateFormat::class,
-                'dateFormat'      => View\Helper\DateFormat::class,
-                'DateFormat'      => View\Helper\DateFormat::class,
-                'numberformat'    => View\Helper\NumberFormat::class,
-                'numberFormat'    => View\Helper\NumberFormat::class,
-                'NumberFormat'    => View\Helper\NumberFormat::class,
-                'plural'          => View\Helper\Plural::class,
-                'Plural'          => View\Helper\Plural::class,
-                'translate'       => View\Helper\Translate::class,
-                'Translate'       => View\Helper\Translate::class,
-                'translateplural' => View\Helper\TranslatePlural::class,
-                'translatePlural' => View\Helper\TranslatePlural::class,
-                'TranslatePlural' => View\Helper\TranslatePlural::class,
+            'aliases'   => [
+                'countryCodeDataList' => View\Helper\CountryCodeDataList::class,
+                'currencyformat'      => View\Helper\CurrencyFormat::class,
+                'currencyFormat'      => View\Helper\CurrencyFormat::class,
+                'CurrencyFormat'      => View\Helper\CurrencyFormat::class,
+                'dateformat'          => View\Helper\DateFormat::class,
+                'dateFormat'          => View\Helper\DateFormat::class,
+                'DateFormat'          => View\Helper\DateFormat::class,
+                'numberformat'        => View\Helper\NumberFormat::class,
+                'numberFormat'        => View\Helper\NumberFormat::class,
+                'NumberFormat'        => View\Helper\NumberFormat::class,
+                'plural'              => View\Helper\Plural::class,
+                'Plural'              => View\Helper\Plural::class,
+                'translate'           => View\Helper\Translate::class,
+                'Translate'           => View\Helper\Translate::class,
+                'translateplural'     => View\Helper\TranslatePlural::class,
+                'translatePlural'     => View\Helper\TranslatePlural::class,
+                'TranslatePlural'     => View\Helper\TranslatePlural::class,
 
                 // Legacy Zend Framework aliases
-                \Zend\I18n\View\Helper\CurrencyFormat::class => View\Helper\CurrencyFormat::class,
-                \Zend\I18n\View\Helper\DateFormat::class => View\Helper\DateFormat::class,
-                \Zend\I18n\View\Helper\NumberFormat::class => View\Helper\NumberFormat::class,
-                \Zend\I18n\View\Helper\Plural::class => View\Helper\Plural::class,
-                \Zend\I18n\View\Helper\Translate::class => View\Helper\Translate::class,
-                \Zend\I18n\View\Helper\TranslatePlural::class => View\Helper\TranslatePlural::class,
+                'Zend\I18n\View\Helper\CurrencyFormat'  => View\Helper\CurrencyFormat::class,
+                'Zend\I18n\View\Helper\DateFormat'      => View\Helper\DateFormat::class,
+                'Zend\I18n\View\Helper\NumberFormat'    => View\Helper\NumberFormat::class,
+                'Zend\I18n\View\Helper\Plural'          => View\Helper\Plural::class,
+                'Zend\I18n\View\Helper\Translate'       => View\Helper\Translate::class,
+                'Zend\I18n\View\Helper\TranslatePlural' => View\Helper\TranslatePlural::class,
             ],
             'factories' => [
-                View\Helper\CurrencyFormat::class  => InvokableFactory::class,
-                View\Helper\DateFormat::class      => InvokableFactory::class,
-                View\Helper\NumberFormat::class    => InvokableFactory::class,
-                View\Helper\Plural::class          => InvokableFactory::class,
-                View\Helper\Translate::class       => InvokableFactory::class,
-                View\Helper\TranslatePlural::class => InvokableFactory::class,
+                View\Helper\CountryCodeDataList::class => View\Helper\Container\CountryCodeDataListFactory::class,
+                View\Helper\CurrencyFormat::class      => InvokableFactory::class,
+                View\Helper\DateFormat::class          => InvokableFactory::class,
+                View\Helper\NumberFormat::class        => InvokableFactory::class,
+                View\Helper\Plural::class              => InvokableFactory::class,
+                View\Helper\Translate::class           => InvokableFactory::class,
+                View\Helper\TranslatePlural::class     => InvokableFactory::class,
             ],
         ];
     }

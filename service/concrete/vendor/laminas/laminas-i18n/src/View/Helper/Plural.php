@@ -5,6 +5,9 @@ namespace Laminas\I18n\View\Helper;
 use Laminas\I18n\Exception;
 use Laminas\I18n\Translator\Plural\Rule as PluralRule;
 use Laminas\View\Helper\AbstractHelper;
+use Laminas\View\Helper\DeprecatedAbstractHelperHierarchyTrait;
+
+use function is_array;
 
 /**
  * Helper for rendering text based on a count number (like the I18n plural translation helper, but when translation
@@ -20,25 +23,14 @@ use Laminas\View\Helper\AbstractHelper;
  */
 class Plural extends AbstractHelper
 {
+    use DeprecatedAbstractHelperHierarchyTrait;
+
     /**
      * Plural rule to use
      *
-     * @var PluralRule
+     * @var PluralRule|null
      */
     protected $rule;
-
-    /**
-     * @throws Exception\ExtensionNotLoadedException if ext/intl is not present
-     */
-    public function __construct()
-    {
-        if (! extension_loaded('intl')) {
-            throw new Exception\ExtensionNotLoadedException(sprintf(
-                '%s component requires the intl PHP extension',
-                __NAMESPACE__
-            ));
-        }
-    }
 
     /**
      * Given an array of strings, a number and, if wanted, an optional locale (the default one is used
@@ -51,17 +43,16 @@ class Plural extends AbstractHelper
      */
     public function __invoke($strings, $number)
     {
-        if (null === $this->getPluralRule()) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'No plural rule was set'
-            ));
+        $rule = $this->getPluralRule();
+        if ($rule === null) {
+            throw new Exception\InvalidArgumentException('No plural rule was set');
         }
 
         if (! is_array($strings)) {
             $strings = (array) $strings;
         }
 
-        $pluralIndex = $this->getPluralRule()->evaluate($number);
+        $pluralIndex = $rule->evaluate($number);
 
         return $strings[$pluralIndex];
     }
@@ -86,7 +77,7 @@ class Plural extends AbstractHelper
     /**
      * Get the plural rule to use
      *
-     * @return PluralRule
+     * @return PluralRule|null
      */
     public function getPluralRule()
     {

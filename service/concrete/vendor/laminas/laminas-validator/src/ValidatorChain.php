@@ -3,9 +3,11 @@
 namespace Laminas\Validator;
 
 use Countable;
+use IteratorAggregate;
 use Laminas\ServiceManager\ServiceManager;
 use Laminas\Stdlib\PriorityQueue;
 use ReturnTypeWillChange;
+use Traversable;
 
 use function array_replace;
 use function assert;
@@ -16,10 +18,10 @@ use const SORT_NUMERIC;
 
 /**
  * @psalm-type QueueElement = array{instance: ValidatorInterface, breakChainOnFailure: bool}
+ * @implements IteratorAggregate<array-key, QueueElement>
+ * @final
  */
-class ValidatorChain implements
-    Countable,
-    ValidatorInterface
+class ValidatorChain implements Countable, IteratorAggregate, ValidatorInterface
 {
     /**
      * Default priority at which validators are added
@@ -48,7 +50,6 @@ class ValidatorChain implements
      */
     public function __construct()
     {
-        /** @psalm-suppress InvalidPropertyAssignmentValue */
         $this->validators = new PriorityQueue();
     }
 
@@ -98,7 +99,7 @@ class ValidatorChain implements
      * @return ValidatorInterface
      * @template T of ValidatorInterface
      * @psalm-param string|class-string<T> $name
-     * @psalm-return ($name is class-string ? T : ValidatorInterface)
+     * @psalm-return ValidatorInterface
      */
     public function plugin($name, ?array $options = null)
     {
@@ -248,7 +249,7 @@ class ValidatorChain implements
     {
         $this->messages = [];
         $result         = true;
-        foreach ($this->validators as $element) {
+        foreach ($this as $element) {
             $validator = $element['instance'];
             assert($validator instanceof ValidatorInterface);
             if ($validator->isValid($value, $context)) {
@@ -301,10 +302,9 @@ class ValidatorChain implements
     /**
      * Invoke chain as command
      *
-     * @param  mixed $value
      * @return bool
      */
-    public function __invoke($value)
+    public function __invoke(mixed $value)
     {
         return $this->isValid($value);
     }
@@ -330,5 +330,11 @@ class ValidatorChain implements
     public function __sleep()
     {
         return ['validators', 'messages'];
+    }
+
+    /** @return Traversable<array-key, QueueElement> */
+    public function getIterator(): Traversable
+    {
+        return clone $this->validators;
     }
 }

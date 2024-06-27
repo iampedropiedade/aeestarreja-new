@@ -3,6 +3,7 @@
 namespace Laminas\Cache\Pattern;
 
 use Laminas\Cache\Exception;
+use Stringable;
 
 use function array_shift;
 use function array_unshift;
@@ -13,7 +14,7 @@ use function method_exists;
 use function property_exists;
 use function strtolower;
 
-class ObjectCache extends CallbackCache
+class ObjectCache extends CallbackCache implements Stringable
 {
     /**
      * @return ObjectCache
@@ -24,10 +25,6 @@ class ObjectCache extends CallbackCache
 
         if (! $options->getObject()) {
             throw new Exception\InvalidArgumentException("Missing option 'object'");
-        }
-
-        if (! $this->getStorage()) {
-            throw new Exception\InvalidArgumentException("Missing option 'storage'");
         }
 
         return $this;
@@ -211,10 +208,9 @@ class ObjectCache extends CallbackCache
      * @phpcs:disable Squiz.Commenting.FunctionComment.InvalidReturnVoid
      *
      * @param  string $name
-     * @param  mixed  $value
      * @return void
      */
-    public function __set($name, $value)
+    public function __set($name, mixed $value)
     {
         return $this->call('__set', [$name, $value]);
     }
@@ -278,12 +274,10 @@ class ObjectCache extends CallbackCache
      * Handle casting to string
      *
      * @see    http://php.net/manual/language.oop5.magic.php#language.oop5.magic.tostring
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->call('__toString');
+        return (string) $this->call('__toString');
     }
 
     /**
