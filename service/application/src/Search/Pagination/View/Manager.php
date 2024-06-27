@@ -2,7 +2,7 @@
 namespace Application\Search\Pagination\View;
 
 use Concrete\Core\Support\Manager as CoreManager;
-use Concrete\Core\Search\Pagination\View\ConcreteBootstrap3View;
+use Concrete\Core\Search\Pagination\View\ConcreteBootstrap4View;
 
 class Manager extends CoreManager
 {
@@ -13,6 +13,6 @@ class Manager extends CoreManager
     
     protected function createDashboardDriver()
     {
-        return new ConcreteBootstrap3View();
+        return new ConcreteBootstrap4View();
     }
 }

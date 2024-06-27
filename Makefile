@@ -32,12 +32,16 @@ ui:
 composer:
 	docker exec -it aeestarreja_app sh -c "cd /var/www/html && composer install"
 
+doctrine:
+	docker exec -it aeestarreja_app sh -c "cd /var/www/html && concrete/bin/concrete5 orm:generate:proxies"
+
 git-pull:
 	eval $(ssh-agent -s) && ssh-add ~/.ssh/aeestarreja_rsa && git pull
 
 deploy:
 	$(MAKE) git-pull
 	$(MAKE) composer
+	$(MAKE) doctrine
 	$(MAKE) ui
 
 sync-files:
