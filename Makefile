@@ -27,7 +27,7 @@ open:
 	open http://localhost:8090/
 
 ui:
-	docker exec -it aeestarreja_app sh -c "cd /var/www/html/application/themes/aee/assets && yarn production"
+	docker exec -it aeestarreja_app sh -c "cd /var/www/html/application/themes/aee/assets && yarn install && yarn production"
 
 composer:
 	docker exec -it aeestarreja_app sh -c "cd /var/www/html && composer install"

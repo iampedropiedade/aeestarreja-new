@@ -11,7 +11,7 @@ $this->inc('elements/widgets/heading.php', ['headingImage' => true]);
     $a = new Area('Top Content');
     $a->display($c);
     ?>
-    <?php $this->inc('elements/pages/list.php', ['pages'=>$pages]); ?>
+    <?php $this->inc('elements/pages/list.php', ['pages' => $pages ?? null]); ?>
     <?php
     $a = new Area('Main');
     $a->display($c);
