@@ -39,7 +39,7 @@ git-pull:
 	eval $(ssh-agent -s) && ssh-add ~/.ssh/aeestarreja_rsa && git pull
 
 permissions:
-	cd /home/aeestarreja/aeestarreja && sudo chmod 775 -R application/config/generated_overrides && sudo chown www-data -R application/config/generated_overrides && sudo chmod 775 -R application/config/doctrine && sudo chown www-data -R application/config/generated_overrides && sudo chmod 775 -R application/files/cache && sudo chown www-data -R application/files/cache
+	cd /home/aeestarreja && sudo chmod 775 -R application/config/generated_overrides && sudo chown www-data -R application/config/generated_overrides && sudo chmod 775 -R application/config/doctrine && sudo chown www-data -R application/config/generated_overrides && sudo chmod 775 -R application/files/cache && sudo chown www-data -R application/files/cache
 
 deploy:
 	$(MAKE) git-pull
