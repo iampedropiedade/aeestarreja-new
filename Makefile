@@ -39,7 +39,7 @@ git-pull:
 	eval $(ssh-agent -s) && ssh-add ~/.ssh/aeestarreja_rsa && git pull
 
 permissions:
-    docker exec -it aeestarreja_app sh -c "cd /var/www/html && sudo chmod 775 -R application/config/generated_overrides && sudo chown www-data:www-data -R application/config/generated_overrides && sudo chmod 775 -R application/config/doctrine && sudo chown www-data:www-data -R application/config/generated_overrides && sudo chmod 775 -R application/files/cache && sudo chown www-data:www-data -R application/files/cache"
+	docker exec -it aeestarreja_app sh -c "cd /var/www/html && sudo chmod 775 -R application/config/generated_overrides && sudo chown www-data:www-data -R application/config/generated_overrides && sudo chmod 775 -R application/config/doctrine && sudo chown www-data:www-data -R application/config/generated_overrides && sudo chmod 775 -R application/files/cache && sudo chown www-data:www-data -R application/files/cache"
 
 deploy:
 	$(MAKE) git-pull
