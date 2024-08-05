@@ -12,4 +12,3 @@
 # Ignore developer stuff
 *.DS_Store
 /.idea
-/.env
