@@ -44,7 +44,6 @@ permissions:
 deploy:
 	$(MAKE) git-pull
 	$(MAKE) permissions
-	$(MAKE) composer
 	$(MAKE) doctrine
 	$(MAKE) ui
 

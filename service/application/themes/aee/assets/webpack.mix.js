@@ -8,7 +8,7 @@ mix.webpackConfig({
 });
 mix.options({
     fileLoaderDirs:  {
-        fonts: 'application/themes/aee/app/fonts'
+        fonts: '../app/fonts'
     }
 });
 
@@ -18,6 +18,6 @@ mix.define({
 
 mix.setPublicPath('../app');
 mix.copyDirectory('images', '../app/images');
-mix.copyDirectory('node_modules/@fortawesome/fontawesome-free/webfonts', '../app/fonts')
+// mix.copyDirectory('node_modules/@fortawesome/fontawesome-free/webfonts', '../app/fonts')
 mix.sass('stylesheets/main.scss', '../app/stylesheets/main.css')
 mix.js('javascript/main.js', '../app/javascript/main.js').vue()
