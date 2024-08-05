@@ -122,7 +122,8 @@
     "tubalmartin/cssmin": "^4.1",
     "ssddanbrown/htmldiff": "^1.0",
     "zircote/swagger-php": "^4.4",
-    "concretecms/dependency-patches": "^1.7.2"
+    "concretecms/dependency-patches": "^1.7.2",
+    "sentry/sentry": "^4.8"
   },
   "replace": {
     "laminas/laminas-cache-storage-adapter-apc": "*",

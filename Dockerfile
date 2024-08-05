@@ -76,7 +76,7 @@ RUN mkdir -p /home/devuser/.composer && \
 
 RUN mkdir -p /var/www/html/application/files/cache && chown -R www-data:www-data /var/www/html/application/files/cache && chmod -R 775 /var/www/html/application/files/cache
 RUN mkdir -p /var/www/html/application/config/doctrine && chown -R www-data:www-data /var/www/html/application/config/doctrine && chmod -R 775 /var/www/html/application/config/doctrine
-
+RUN pecl install excimer
 
 RUN printf 'y\n1\n\1n' | apt install nodejs
 RUN apt install -y npm

@@ -15,16 +15,16 @@ $app = new Application();
  * ----------------------------------------------------------------------------
  */
 $app->detectEnvironment(
-    array(
-        'local' => array(
-            'hostname',
-        ),
-        'staging' => array(
-            'aeestarreja.staging.pedropiedade.com',
-        ),
-        'production' => array(
+    [
+        'development' => [
+            'localhost',
+        ],
+        'staging' => [
+            'aeestarreja.pedropiedade.com',
+        ],
+        'production' => [
+            'aeestarreja.pt',
             'www.aeestarreja.pt',
-        ),
-    ));
-
+        ],
+    ]);
 return $app;

@@ -1,8 +1,8 @@
 build:
-	docker-compose build
+	docker compose build
 
 start:
-	docker-compose up -d
+	docker compose up -d
 
 stop:
 	docker stop aeestarreja_app
@@ -38,6 +38,9 @@ doctrine:
 git-pull:
 	eval $(ssh-agent -s) && ssh-add ~/.ssh/aeestarreja_rsa && git pull
 
+permissions:
+	cd /home/aeestarreja/aeestarreja && sudo chmod 775 -R application/config/generated_overrides && sudo chown www-data -R application/config/generated_overrides && sudo chmod 775 -R application/config/doctrine && sudo chown www-data -R application/config/generated_overrides && sudo chmod 775 -R application/files/cache && sudo chown www-data -R application/files/cache
+
 deploy:
 	$(MAKE) git-pull
 	$(MAKE) composer
@@ -45,4 +48,7 @@ deploy:
 	$(MAKE) ui
 
 sync-files:
-    cd /Users/pedropiedade/Documents/http/pedro/aeestarreja/aeestarreja/service/application && rsync -arv --stats --exclude='cache' root@68.183.78.54:/var/www/html/public/application/files .
+	cd /Users/pedropiedade/Documents/http/pedro/aeestarreja/aeestarreja/service/application && rsync -arv --stats --exclude='cache' root@68.183.78.54:/var/www/html/public/application/files .
+
+ssh:
+	ssh root@164.92.227.63
