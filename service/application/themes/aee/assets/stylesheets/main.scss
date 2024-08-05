@@ -1,3 +1,5 @@
+$fa-font-path: "/application/themes/aee/app/fonts";
+
 @import "~bootstrap/scss/functions";
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/mixins";
@@ -6,7 +8,6 @@
 @import "~@fortawesome/fontawesome-free/scss/regular.scss";
 @import "~@fortawesome/fontawesome-free/scss/solid.scss";
 @import "~@fortawesome/fontawesome-free/scss/brands.scss";
-
 @import "scss/original/select2.min.css";
 @import "scss/original/select2-bootstrap4.min.css";
 @import "scss/original/animate.css";
