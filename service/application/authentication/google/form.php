@@ -46,7 +46,7 @@
         <div class="bg-light p-4 p-md-5 contact-form">
             <div class="form-group">
                 <a href="<?= \URL::to('/ccm/system/authentication/oauth2/google/attempt_auth'); ?>" class="btn btn-primary py-3 px-5">
-                    <i class="fa fa-google"></i>
+                    <i class="fa-brands fa-google"></i>
                     <?= t('Log in with %s', 'Google') ?>
                 </a>
             </div>
