@@ -43,6 +43,9 @@ permissions:
 
 deploy:
 	$(MAKE) git-pull
+	$(MAKE) build
+	$(MAKE) stop
+	$(MAKE) start
 	$(MAKE) permissions
 	$(MAKE) doctrine
 	$(MAKE) ui
