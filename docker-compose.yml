@@ -12,6 +12,7 @@ services:
       - ./service:/var/www/html
       - /var/www/html/application/files/cache
       - /var/www/html/application/config/doctrine
+      - /var/www/html/application/config/generated_overrides
       - ./docker/apache2/sites-available:/etc/apache2/sites-available:cached
       - ./docker/php/php.ini:/usr/local/etc/php/php.ini:cached
     ports:
