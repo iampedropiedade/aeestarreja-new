@@ -44,7 +44,7 @@ permissions:
 deploy:
 	$(MAKE) git-pull
 	$(MAKE) build
-	$(MAKE) stop
+	docker stop aeestarreja_app
 	$(MAKE) start
 	$(MAKE) permissions
 	$(MAKE) doctrine
